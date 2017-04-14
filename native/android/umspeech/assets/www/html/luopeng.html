@@ -1,0 +1,313 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>summer</title>
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" href="../css/iuapmobile.um.css" />
+		<style>
+			html{
+				background-image: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+			}
+			.um-header{
+				padding-top:20px;
+				background-image: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
+			}
+			.um-header-title, .um-header h3, .um-header-light h3{
+				color:#666666;
+				font-weight:500;
+			}
+			.um-back, .um-header-right, .um-header-left{
+				top:20px;
+				left:20px;
+			}
+			.um-back:before{
+				border-left:2px solid #666;
+				border-bottom:2px solid #666;
+			}
+			.um-list {
+				font-size: 14px;
+			}
+			.um-list .um-list-item{
+				padding-top:5px;
+				padding-bottom: 5px;
+			}
+			.um-list .um-list-item-inner{
+				position:static;
+			}
+			.um-content{
+				overflow-y: scroll;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="wrap" class="um-win">
+			<header class="um-header" id="header" >
+				<a class="um-back" onclick="summer.closeWin()"></a>
+				<h3 class="title">报销出行费用</h1>
+				
+			</header>
+			<div id="main" class="um-content">
+				<ul class="um-list">
+					<li class="um-list-item">
+						<div class="um-list-item-inner">
+							<div class="um-list-item-left pl15">
+								日期
+							</div>
+							<div class="um-list-item-right">
+								<input type="text" class="form-control" id="date">
+							</div>
+						</div>
+					</li>
+					<li class="um-list-item">
+						<div class="um-list-item-inner">
+							<div class="um-list-item-left pl15">
+								起始地
+							</div>
+							<div class="um-list-item-right">
+								<input type="text" class="form-control" id="start">
+							</div>
+						</div>
+					</li>
+					<li class="um-list-item">
+						<div class="um-list-item-inner">
+							<div class="um-list-item-left pl15">
+								目的地
+							</div>
+							<div class="um-list-item-right">
+								<input type="text" class="form-control" id="end">
+							</div>
+						</div>
+					</li>
+					<li class="um-list-item">
+						<div class="um-list-item-inner">
+							<div class="um-list-item-left pl15">
+								交通工具
+							</div>
+							<div class="um-list-item-right">
+								<input type="text" class="form-control" id="vehicle">
+							</div>
+						</div>
+					</li>
+					<li class="um-list-item">
+						<div class="um-list-item-inner">
+							<div class="um-list-item-left pl15">
+								报销金额(元)
+							</div>
+							<div class="um-list-item-right">
+								<input type="text" class="form-control" id="money">
+							</div>
+						</div>
+					</li>
+					<li class="um-list-item">
+						<div class="um-list-item-inner">
+							<div class="um-list-item-left pl15">
+								费用类型
+							</div>
+							<div class="um-list-item-right">
+								<input type="text" class="form-control" id="type">
+							</div>
+						</div>
+					</li>
+				</ul>
+<!-- 				<input type="text" id="text" class="form-control"/>
+				<button class="btn" onclick="a()">get提交</button>
+				<button class="btn" onclick="b()">post提交</button> -->
+				<div class="mt30 p15 pr15">
+					<button class="btn um-btn" onclick="startSpeech()">点击开始语音录单</button>
+				</div>
+				<div class="mt30 p15 pr15">
+					<div id="title"></div>
+				</div>
+			</div>
+		</div>
+		
+		
+		
+	</body>
+	<script type="text/javascript" src="../js/summer.js"></script>
+	<script src="../js/jquery-2.1.4.min.js"></script>
+	<script src="../js/layer_mobile/layer.js"></script>
+	<script>
+		var dilog = "";
+		summerready = function () {
+			//初始化语音
+			var param = {};
+			//if($summer.os == "ios"){
+				//param =  {"appid" : "58a105c0"}
+			//}
+			summer.callService("SpeechService.init", param, false);
+		};
+		function startSpeech(){
+			//alert("开始语音识别...");
+			//语音识别
+			summer.callService("SpeechService.openSpeechBackString", {
+				"callback" : "microPhoneSuccess()",
+				"error" : "microPhoneError()"
+			}, false);
+			
+		}
+
+		function microPhoneSuccess(sender, args) {
+			//alert("ok");
+			if(typeof args != "object"){
+				alert("返回值不是一个有效的json，请联系平台开发人员修改")
+			}
+		
+			var keyword = args.result;
+			//alert(keyword);
+			$summer.byId("title").innerHTML = keyword;
+			
+			
+			
+			if(args.isLast == 'true'){
+				//alert(args.isLast)
+				translateFromCloud(keyword);
+			}
+		}
+		function microPhoneError(sender, args) {
+			alert("语音识别发生error，请开发协助检查");
+		}
+		function translateFromCloud(val){
+			var param = {
+				s : val,
+				key : "36fd27068baf433b82eb8c7fada847da",
+				dilog : dilog
+			};
+			
+		    summer.ajax({
+		    	type : "post",
+		    	url : "https://ia.yonyoucloud.com/api/luis/v1/analysis/",
+		    	param : param
+		    },function(response){
+		        var json = JSON.parse(response.data);
+		        // 将信息返回到全局变量
+		        dilog = json.dilog;
+		        
+				var returnstr = json.msg;
+				
+				layer.open({
+				    content: returnstr,
+				    style:"bottom:50%;",
+				    skin: 'msg',
+    				time: 4 //2秒后自动关闭
+				});
+				// 当第一条件 报销类型不明确时  阻断
+				if (json.status == 0){
+					return false;
+				}
+				// 当 1，2 时 都为渲染里边的
+				var paramData = json.data;
+					
+				var p_date = paramData.travelDate ? paramData.travelDate : "";
+				var p_tolocation = paramData.toCity ? paramData.toCity : ""
+				var p_fromlocation = paramData.fromCity ? paramData.fromCity : ""
+				var p_ticket = paramData.travelWay ? paramData.travelWay : ""
+				var p_money = paramData.money ? paramData.money : ""
+				var p_type = paramData.expensetype ? paramData.expensetype : ""
+				
+				var date = $summer.byId("date");
+	            var start = $summer.byId("start");
+	            var end = $summer.byId("end");
+	            var vehicle = $summer.byId("vehicle");
+	            var money = $summer.byId("money");
+	            var type = $summer.byId("type");
+	            
+	            $summer.val(date,p_date);
+	            $summer.val(start,p_fromlocation);
+	            $summer.val(end,p_tolocation);
+	            $summer.val(vehicle,p_ticket);
+	            $summer.val(money,p_money);
+	            $summer.val(type,p_type);
+				     
+		    },function(response){
+		    	alert(response.status);
+		    });
+		}
+		
+		
+		/*******************************************************************************/
+		
+		//以下是自定义语音UI代码
+	
+		
+		function init(val){
+			var param = {
+				s : val,
+				key : "36fd27068baf433b82eb8c7fada847da",
+				dilog : dilog
+			};
+			
+		    summer.ajax({
+		    	type : "post",
+		    	url : "https://ia.yonyoucloud.com/api/luis/v1/analysis/",
+		    	param : param
+		    },function(response){
+		        var json = JSON.parse(response.data);
+		        // 将信息返回到全局变量
+		        dilog = json.dilog;
+		        
+				var returnstr = json.msg;
+				
+				layer.open({
+				    content: returnstr,
+				    style:"bottom:50%;",
+				    skin: 'msg',
+    				time: 4 //2秒后自动关闭
+				});
+				// 当第一条件 报销类型不明确时  阻断
+				if (json.status == 0){
+					return false;
+				}
+				// 当 1，2 时 都为渲染里边的
+				var paramData = json.data;
+					
+				var p_date = paramData.travelDate ? paramData.travelDate : "";
+				var p_tolocation = paramData.toCity ? paramData.toCity : ""
+				var p_fromlocation = paramData.fromCity ? paramData.fromCity : ""
+				var p_ticket = paramData.travelWay ? paramData.travelWay : ""
+				var p_money = paramData.money ? paramData.money : ""
+				var p_type = paramData.expensetype ? paramData.expensetype : ""
+				
+				var date = $summer.byId("date");
+	            var start = $summer.byId("start");
+	            var end = $summer.byId("end");
+	            var vehicle = $summer.byId("vehicle");
+	            var money = $summer.byId("money");
+	            var type = $summer.byId("type");
+	            
+	            $summer.val(date,p_date);
+	            $summer.val(start,p_fromlocation);
+	            $summer.val(end,p_tolocation);
+	            $summer.val(vehicle,p_ticket);
+	            $summer.val(money,p_money);
+	            $summer.val(type,p_type);
+				     
+		    },function(response){
+		    	alert(response.status);
+		    });
+		}
+		// 语音
+		function succussCallback(args) {
+			// 转换成的文字
+		    var keyword = args.result;
+		    init(keyword);
+		}
+		function errorCallback(sender, args) {
+		    alert(args)
+		}
+		
+		
+		// 按钮调用的   H5测试罗鹏端口
+		function a(){
+			var val = $("#text").val();
+			init(val,"get");
+		}
+		function b(){
+			var val = $("#text").val();
+			init(val,"post");
+		}
+	</script>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>summer</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  </head>
+<body>
+</body>
+<script type="text/javascript" src="./js/summer.js"></script>
+<script>
+//判断是否为空
+function isEmpty(data) {
+    if (data == undefined || data == null || data == "" || data=='NULL' || data==false || data=='false') {
+        return true;
+    }
+    return false;
+}
+summerready = function(){
+
+    var url = "index.html";
+    var id = "root";
+    openNewWin(url,id);
+}
+function openNewWin(url,id){
+    var os = $summer.os;
+    
+    if (os == "android"){
+
+        summer.callService(
+            "EMMClient.startActivity",
+            {'url':url},
+            false
+        );
+
+    }else {
+        summer.openWin({
+            'id' : id,
+            'url':url
+        });
+    }
+}
+
+</script>
+</html>

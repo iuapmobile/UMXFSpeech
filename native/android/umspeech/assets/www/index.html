@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="css/iuapmobile.um.css">
+		<script src="js/summer.js" ></script>
+		<style>
+			.um-header{
+				padding-top:20px;
+				background-image: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
+				border-bottom:2px solid #000;
+			}
+			.um-header-title, .um-header h3, .um-header-light h3{
+				color:#666666;
+				font-weight:500;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<div id="win" class="um-win" >
+			<div id="header" class="um-header">
+				<h3>iuap mobile</h3>
+			</div>
+
+			<div id="content" class="um-content p15">
+				<div class="p20">
+					<button class="btn" onclick="openWin()">打开语音录入单据</button>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		summerready = function(){
+			//��ʼ������
+			//summer.callService("SpeechService.init", {"appid" : "58a105c0"}, false);
+		}
+		/*
+		function openWin(){
+			var param = {
+				id : "luopeng",
+				url : 'html/luopeng.html',
+				type : 'speechWin',
+				speechCallback:"succussCallback()",
+				animation : {
+					type : "movein", //动画类型（详见动画类型常量）
+					subType : "from_right", //动画子类型（详见动画子类型常量）
+					duration : 300
+				}
+			};
+			summer.openWin(param);
+		}
+		*/
+		function openWin(){
+			var param = {
+				id : "luopeng",
+				url : 'html/luopeng.html',
+				animation : {
+					type : "movein", //动画类型（详见动画类型常量）
+					subType : "from_right", //动画子类型（详见动画子类型常量）
+					duration : 300
+				}
+			};
+			summer.openWin(param);
+		}
+	</script>
+</html>
